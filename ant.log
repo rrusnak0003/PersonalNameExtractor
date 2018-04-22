@@ -1,0 +1,47 @@
+
+download-ivy:
+
+install-ivy:
+Trying to override old definition of task antlib:org.apache.ivy.ant:buildobr
+
+resolve-ivy:
+Trying to override old definition of task antlib:org.apache.ivy.ant:buildobr
+[ivy:resolve] :: Apache Ivy 2.4.0 - 20141213170938 :: http://ant.apache.org/ivy/ ::
+[ivy:resolve] :: loading settings :: file = C:\Users\Angela\git\Red2\PNE\ivysettings.xml
+[ivy:resolve] :: resolving dependencies :: edu.odu.cs#Personal Name Extractor;working@Angela-PC
+[ivy:resolve] 	confs: [default]
+[ivy:resolve] 	found junit#junit;4.11 in public
+[ivy:resolve] 	found org.hamcrest#hamcrest-core;1.3 in public
+[ivy:resolve] :: resolution report :: resolve 531ms :: artifacts dl 15ms
+	---------------------------------------------------------------------
+	|                  |            modules            ||   artifacts   |
+	|       conf       | number| search|dwnlded|evicted|| number|dwnlded|
+	---------------------------------------------------------------------
+	|      default     |   2   |   0   |   0   |   0   ||   2   |   0   |
+	---------------------------------------------------------------------
+[ivy:resolve] 
+[ivy:resolve] :: problems summary ::
+[ivy:resolve] :::: ERRORS
+[ivy:resolve] 	unknown resolver main
+
+[ivy:resolve] 	unknown resolver main
+
+[ivy:resolve] 
+:: USE VERBOSE OR DEBUG MESSAGE LEVEL FOR MORE DETAILS
+
+compile:
+
+compile-tests:
+
+test:
+    [mkdir] Created dir: C:\Users\Angela\git\Red2\PNE\target\test-results
+
+package:
+      [jar] Building jar: C:\Users\Angela\git\Red2\PNE\target\projectName.jar
+      [zip] Building zip: C:\Users\Angela\git\Red2\PNE\target\projectName-src.zip
+
+clean:
+   [delete] Deleting directory C:\Users\Angela\git\Red2\PNE\target
+BUILD SUCCESSFUL
+
+BUILD SUCCESSFUL

@@ -1,0 +1,9 @@
+<ivy-module version="2.0">
+	<info module="Personal Name Extractor" organisation="edu.odu.cs" />
+	<dependencies defaultconfmapping="*->default">
+		<dependency org="junit" name="junit" rev="4.11" />
+		<dependency org="nz.ac.waikato.cms.weka" name="weka-stable" rev="3.6.12" />
+		<dependency org="org.jacoco" name="org.jacoco.ant" rev="latest.integration"/>
+		<dependency org="com.google.code.findbugs" name="findbugs" rev="3.0.1"/>
+	</dependencies>
+</ivy-module>

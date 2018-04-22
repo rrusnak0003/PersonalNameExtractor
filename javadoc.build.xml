@@ -1,0 +1,37 @@
+<project>
+	<!--
+	<property name="src.dir" value="src/main/java" />
+	<property name="test.dir" value="src/test/java" />
+	<property name="javadoc.dir" value="target/javadoc" />
+	!-->
+	
+	<property file="build.properties" />
+
+	<target name="generate-javadoc">
+		<javadoc destdir="${javadoc.dir}" version="true" windowtitle="Personal Name Extractor: API Documentation">
+
+			<doctitle>
+				<![CDATA[= Personal Name Extractor =]]>
+			</doctitle>
+
+			<bottom>
+				<![CDATA[Copyright © 2016. All Rights Reserved.]]>
+			</bottom>
+
+			<group title="Javadocs ..." packages="cs.odu.edu.**" />
+			
+			<fileset dir="${src.dir}" includes="**/*.java" />
+			<fileset dir="${test.dir}" includes="**/*.java" />
+		</javadoc>
+		<echo message="java doc has been generated!" />
+	</target>
+
+	<target name="clean-javadoc" description="Clean javadoc directories">
+		<delete>
+			<fileset dir="${javadoc.dir}" erroronmissingdir="false">
+				<include name="**/*" />
+			</fileset>
+			<dirset dir="${javadoc.dir}" erroronmissingdir="false" />
+		</delete>
+	</target>
+</project>

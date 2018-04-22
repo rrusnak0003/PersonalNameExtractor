@@ -1,0 +1,191 @@
+<project name="Personal Name Extractor" basedir="." default="build" xmlns:ivy="antlib:org.apache.ivy.ant" xmlns:jacoco="antlib:org.jacoco.ant">
+
+	<description>
+		Extract Metadata Extractor - top level
+	</description>
+
+
+	<!-- IMPORTS /////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////// !-->
+	<import file="ivy.build.xml" />
+	<import file="javadoc.build.xml" />
+
+
+	<!-- PROPERTIES //////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////// !-->
+	<!-- <property name="src.dir" value="src/main/java" />
+	<property name="test.dir" value="src/test/java" />
+	<property name="target.dir" value="target" />
+	<property name="bin.class.dir" location="${target.dir}/classes" />
+	<property name="test.class.dir" location="${target.dir}/test-classes" />
+	<property name="junit.results.dir" location="${target.dir}/test-results" />
+	!-->
+
+	<property file="build.properties" />
+
+
+	<!-- CLASSPATHS //////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////// !-->
+	<path id="master-classpath">
+		<pathelement path="." />
+		<pathelement path="${bin.class.dir}" />
+		<path refid="ivy.path" />
+		<!-- from ivy.build.xml !-->
+	</path>
+
+	<path id="test.execution.path">
+		<!-- for junit !-->
+		<pathelement path="target/test-classes" />
+		<pathelement path="target/classes" />
+		<path refid="ivy.path" />
+	</path>
+
+
+	<!-- TARGETS /////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////// !-->
+	<target name="build" depends="compile,findbugs,test,coverage-report,generate-javadoc,generate-jar">
+
+	</target>
+
+	<target name="generate-jar">
+		<echo>Generating executable JAR...</echo>
+		<jar destfile="${target.dir}/PNE.jar" basedir="${bin.class.dir}">
+			<manifest>
+				<attribute name="Main-Class" value="edu.odu.cs.cs350.namex.Extractor" />
+			</manifest>
+		</jar>
+	</target>
+
+	<target name="compile" description="Compile source tree java files" depends="resolve-ivy">
+		<echo>... mkdir "${bin.class.dir}"</echo>
+		<echo>... javac output="${bin.class.dir}" src="${src.dir}" classpath="${master-classpath}"</echo>
+		<mkdir dir="${bin.class.dir}" />
+		<javac destdir="${bin.class.dir}" source="1.7" target="1.7" includeantruntime="false" includes="**/*.java">
+			<src path="${src.dir}" />
+			<classpath refid="master-classpath" />
+		</javac>
+	</target>
+
+
+	<!-- Testing related !-->
+	<target name="compile-tests" depends="compile" description="Compile JUnit tests">
+		<mkdir dir="target/test-classes" />
+		<javac srcdir="${test.dir}" destdir="target/test-classes" source="1.7" optimize="on" debug="on" includeantruntime="false">
+			<!-- <classpath refid="master-classpath" /> !-->
+			<classpath refid="test.execution.path" />
+		</javac>
+	</target>
+
+	<target name="test" depends="compile-tests" description="Run all unit tests, producing summary report in target/test-results.">
+		<echo>... mkdir "${junit.results.dir}/details"</echo>
+		<mkdir dir="${junit.results.dir}/details" />
+		<jacoco:coverage destfile="target/coverage-report/jacoco.exec">
+			<junit printsummary="yes" haltonfailure="no" fork="yes">
+				<classpath>
+					<pathelement location="${test.class.dir}" />
+					<pathelement location="${bin.class.dir}" />
+					<path refid="ivy.path" />
+				</classpath>
+
+				<batchtest fork="yes" todir="${junit.results.dir}/details">
+					<formatter type="xml" />
+					<fileset dir="${test.dir}">
+						<include name="**/test*.java" />
+					</fileset>
+				</batchtest>
+			</junit>
+		</jacoco:coverage>
+
+		<junitreport todir="${junit.results.dir}">
+			<fileset dir="${junit.results.dir}/details">
+				<include name="TEST-*.xml" />
+			</fileset>
+			<report format="frames" todir="${junit.results.dir}/html" />
+		</junitreport>
+	</target>
+
+	<target name="clean-tests" description="Clean JUnit output directories">
+		<echo>... Remove all .class files from "${target.dir}/test-classes"</echo>
+		<echo>... Remove all .txt and .xml files from "${target.dir}/test-results"</echo>
+		<echo>... Remove all .txt, .xml, .html and .css files from "${target.dir}/test-results"</echo>
+		<delete>
+			<fileset dir="${target.dir}/test-classes" erroronmissingdir="false">
+				<include name="**/*.class" />
+			</fileset>
+			<fileset dir="${target.dir}/test-results" erroronmissingdir="false">
+				<include name="**/*.txt" />
+				<include name="**/*.xml" />
+				<include name="**/*.html" />
+				<include name="**/*.css" />
+			</fileset>
+		</delete>
+	</target>
+
+
+	<!-- COVERAGE ////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////// !-->
+	<target name="coverage-report" depends="test" description="Display how much of the code is actually run.">
+		<mkdir dir="${target.dir}/coverage-report" />
+		<jacoco:report>
+			<executiondata>
+				<file file="${target.dir}/coverage-report/jacoco.exec" />
+			</executiondata>
+
+			<structure name="Code Annotation Project">
+				<classfiles>
+					<fileset dir="target/classes" />
+					<fileset dir="target/test-classes" />
+				</classfiles>
+				<sourcefiles encoding="UTF-8">
+					<fileset dir="src/main/java" />
+					<fileset dir="src/test/java" />
+				</sourcefiles>
+			</structure>
+			<html destdir="target/coverage-report" />
+		</jacoco:report>
+	</target>
+
+
+	<!-- FindBugs ////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////// !-->
+	<target name="findbugs" depends="compile" description="run FindBugs.">
+		<taskdef classname="edu.umd.cs.findbugs.anttask.FindBugsTask" name="findbugs" classpathref="ivy.path" />
+
+		<mkdir dir="${target.dir}/findbugs" />
+		<findbugs output="xml:withMessages" classpathref="ivy.path" pluginList="" outputFile="${target.dir}/findbugs/findbugs.xml">
+			<auxclasspath refid="ivy.path" />
+			<sourcepath path="${src.dir}" />
+			<class location="${bin.class.dir}" />
+		</findbugs>
+
+		<xslt in="${target.dir}/findbugs/findbugs.xml" out="${target.dir}/findbugs/findbugs.html">
+			<style>
+				<javaresource name="fancy.xsl" classpathref="ivy.path" />
+			</style>
+		</xslt>
+	</target>
+
+
+	<!-- Clean up files and directories !-->
+
+	<target name="clean" description="Clean output directories">
+		<echo>... Remove all .class and .jar files from "${bin.class.dir}"</echo>
+		<delete>
+			<fileset dir="${bin.class.dir}" erroronmissingdir="false">
+				<include name="**/*.class" />
+				<include name="**/*.jar" />
+			</fileset>
+			<dirset dir="${bin.class.dir}" erroronmissingdir="false" />
+		</delete>
+	</target>
+
+	<target name="cleanest" description="Clean output directories" depends="clean-javadoc,clean-ivy,clean-tests,clean">
+		<echo>... Remove all .jar files from "${target.dir}"</echo>
+		<delete>
+			<fileset dir="${target.dir}" erroronmissingdir="false">
+				<include name="**/*.jar" />
+			</fileset>
+		</delete>
+		<delete dir="${target.dir}" failonerror="false" />
+	</target>
+</project>
